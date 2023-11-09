@@ -34,3 +34,40 @@ app.get('/api/get-book/:id', async (req, res) => {
 
   res.json(results);
 });
+
+app.post('/api/borrow-book', async (req, res) => {
+  const books = database.collection('books');
+  const borrowed = database.collection('borrowed');
+
+  const { uid, returnDate, bookId } = req.body;
+
+  const borrowedCursor = borrowed.find({ uid: uid });
+  const borrowedResult = await borrowedCursor.toArray();
+
+  let isAlreadyBorrowed = false;
+
+  borrowedResult.forEach(b => {
+    if (b.uid === uid && b.bookId === bookId) {
+      isAlreadyBorrowed = true;
+      res.status(400).json({ message: 'You already borrowed this book' });
+    }
+  })
+
+  if (isAlreadyBorrowed) return;
+
+  try {
+    await borrowed.insertOne({ uid, bookId, date: new Date(), returnDate });
+  } catch (error) {
+    res.status(400).json({ message: 'Failed to update' });
+  }
+
+  const booksCursor = books.find({ _id: new ObjectId(bookId) });
+  const booksResult = await booksCursor.toArray();
+
+
+  const { quantity } = booksResult[0];
+  const newQuantity = quantity - 1;
+  const update = await books.updateOne({ _id: new ObjectId(bookId) }, { $set: { quantity: newQuantity } });
+  res.json(update);
+
+})
