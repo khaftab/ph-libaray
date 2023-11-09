@@ -11,7 +11,7 @@ const client = new MongoClient(process.env.MONGO_URI, {
   }
 });
 
-const database = client.db("ph-brand");
+const database = client.db("ph-library");
 
 async function run() {
   try {
@@ -25,6 +25,8 @@ async function run() {
     await client.close();
   }
 }
+
+// run().catch(console.dir);
 
 // module.exports = run().catch(console.dir);
 module.exports = {
