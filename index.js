@@ -40,7 +40,7 @@ app.post('/api/jwt', (req, res) => {
   const token = jwt.sign({ uid }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
 
   res
-    .cookie('token', token, { httpOnly: true, secure: false, })
+    .cookie('token', token, { httpOnly: true, secure: false, sameSite: `${process.env.NODE_ENV === 'production' ? 'none' : 'lax'}` })
     .send({ success: true })
 })
 
