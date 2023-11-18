@@ -37,7 +37,7 @@ app.listen(PORT, () => {
 
 app.post('/api/jwt', (req, res) => {
   const { uid } = req.body;
-  const token = jwt.sign({ uid }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+  const token = jwt.sign({ uid }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '12h' });
 
   res
     .cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: `${process.env.NODE_ENV === 'production' ? 'none' : 'lax'}` })
@@ -129,7 +129,7 @@ app.post('/api/add-book', verifyToken, async (req, res) => {
     const result = await books.insertOne({ category, name, image, author, short_description, rating, quantity, content });
     res.json(result);
   } catch (error) {
-    res.status(500).send({ message: 'Error adding product' });
+    res.status(500).send({ message: 'Error adding book' });
   }
 })
 
@@ -141,7 +141,7 @@ app.put('/api/update-book/:id', verifyToken, async (req, res) => {
     const result = await books.updateOne({ _id: new ObjectId(id) }, { $set: { category, name, image, author, short_description, rating, quantity, content } });
     res.json(result);
   } catch (error) {
-    res.status(500).send({ message: 'Error updating product' });
+    res.status(500).send({ message: 'Error updating book' });
   }
 })
 
